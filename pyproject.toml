@@ -1,0 +1,30 @@
+[project]
+name = "auto-local-ci-dry-run-for-github-actions"
+version = "0.1.0"
+description = "Validates and runs a workflow's shell steps in a Docker container locally, with a plain-language report of which features (matrix, services, secrets) are unsupported. Aimed at people who don't want to push repeated 'fix ci' commits."
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["auto_local_ci_dry_run_for_github_actions*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

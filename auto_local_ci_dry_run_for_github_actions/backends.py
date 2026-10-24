@@ -48,6 +48,21 @@ class StepOutcome:
         self.timed_out = timed_out
 
 
+def _kill_tree(proc: subprocess.Popen[str]) -> None:
+    """Kill the step and anything it spawned, so a timed-out `sleep` cannot hold the pipe open."""
+    if sys.platform == "win32":
+        subprocess.run(
+            ["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True, check=False
+        )
+    else:
+        import signal
+
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            proc.kill()
+
+
 def _stream(
     argv: list[str], env: dict[str, str] | None, cwd: str | None, prefix: str, out: TextIO,
     timeout: float | None,
@@ -57,6 +72,7 @@ def _stream(
         proc = subprocess.Popen(
             argv, env=env, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             stdin=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace",
+            start_new_session=sys.platform != "win32",
         )  # fmt: skip
     except OSError as exc:
         raise BackendError(f"cannot start {argv[0]}: {exc}") from None
@@ -64,7 +80,7 @@ def _stream(
 
     def kill() -> None:
         timed_out.set()
-        proc.kill()
+        _kill_tree(proc)
 
     timer = threading.Timer(timeout, kill) if timeout else None
     if timer:

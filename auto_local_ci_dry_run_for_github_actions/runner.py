@@ -116,8 +116,8 @@ def _run_steps(
             jr.steps.append(StepResult(step.index, step.name, "skipped", str(exc)))
             continue
         out.write(f"{header}\n")
-        first = resolved.script.strip().splitlines()[0] if resolved.script.strip() else ""
-        out.write(f"   $ {first}{' ...' if len(resolved.script.strip().splitlines()) > 1 else ''}\n")
+        lines = resolved.script.strip().splitlines() or [""]
+        out.write(f"   $ {lines[0]}{' ...' if len(lines) > 1 else ''}\n")
         out.flush()
         try:
             res = session.run(resolved, resolved.env, "   | ", out)

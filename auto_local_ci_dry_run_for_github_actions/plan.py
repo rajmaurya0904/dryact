@@ -315,7 +315,7 @@ def resolve_step(
                 local.env = {**local.env, str(key): env[str(key)]}
     script = interpolate(str(step["run"]), local)
     defaults = _run_defaults(wf, job)
-    shell = str(step.get("shell") or defaults.get("shell") or "bash")
+    shell = str(step.get("shell") or defaults.get("shell") or "")
     workdir = step.get("working-directory") or defaults.get("working-directory") or ""
     workdir = interpolate(str(workdir), local) if workdir else ""
     timeout = step.get("timeout-minutes")

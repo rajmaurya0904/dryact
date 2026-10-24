@@ -114,7 +114,7 @@ def condition(raw: object, ctx: Context) -> bool:
         text = text[1:].strip()
     value = _status_or_value(text, ctx)
     value = (not value) if negate else value
-    if not re.search(r"(success|failure|always|cancelled)\(\)", text):
+    if not re.search(r"(?<![\w])(success|failure|always|cancelled)\(\)", text):
         value = value and ctx.job_status == "success"  # GitHub adds an implicit success()
     return value
 
